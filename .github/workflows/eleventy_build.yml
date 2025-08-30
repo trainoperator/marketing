@@ -1,36 +1,60 @@
-name: Build and Deploy Eleventy
+name: Build and Deploy Eleventy (Yarn + GitHub Pages)
 
 on:
   push:
-    branches: [ main ]   # or whichever branch you use
+    branches: [ main ]   # build when main updates
+  workflow_dispatch:      # allow manual runs
 
 permissions:
-  contents: write  # needed to push to gh-pages
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
 
-      - name: Install dependencies
+      # If you use Yarn 2+/Berry, Corepack ensures the right Yarn version
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Install deps
         run: yarn install --frozen-lockfile
 
-      - name: Build Eleventy site
-        run: yarn build
+      - name: Build site
+        run: |
+          yarn run build
+          # Ensure Pages doesn't treat it as a Jekyll site (important for underscores)
+          touch dist/.nojekyll
+          echo "Contents of dist:"
+          ls -la dist
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          force_orphan: true
+          path: ./dist   # Eleventy output directory
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
