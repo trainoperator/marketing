@@ -1,16 +1,36 @@
-name: Eleventy Build
-on: [push]
+name: Build and Deploy Eleventy
+
+on:
+  push:
+    branches: [ main ]   # or whichever branch you use as your source
+
+permissions:
+  contents: write  # needed to push to gh-pages
 
 jobs:
-  build_deploy:
-    runs-on: ubuntu-18.04
+  build-deploy:
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@master
-      - name: Build
-        uses: TartanLlama/actions-eleventy@master
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          publish_dir: _site 
-          publish_branch: gh-pages
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Eleventy site
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
