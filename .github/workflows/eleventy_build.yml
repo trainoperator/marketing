@@ -2,7 +2,7 @@ name: Build and Deploy Eleventy
 
 on:
   push:
-    branches: [ main ]   # or whichever branch you use as your source
+    branches: [ main ]   # or whichever branch you use
 
 permissions:
   contents: write  # needed to push to gh-pages
@@ -19,13 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Build Eleventy site
-        run: npm run build
+        run: yarn build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
