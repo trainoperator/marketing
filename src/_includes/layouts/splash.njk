@@ -74,9 +74,12 @@
 
     .hero {
       display:grid; gap:.6rem;
-      align-content:center;
+      grid-template-rows: 1fr auto;
+      align-content:stretch;
       grid-area: hero;
+      padding-bottom: clamp(16px, 3vw, 28px);
     }
+    .hero .cta-row{ align-self:end }
     .aside {
       grid-area: aside;
     }
@@ -103,6 +106,12 @@
     }
 
     .cta-row { display:flex; gap:.8rem; flex-wrap:wrap; align-items:center; margin-top:.4rem }
+    /* Keep CTAs at the bottom without overlapping headline */
+    .hero { min-height: 100%; }
+    .hero .cta-row { margin-top: auto; align-self: end; }
+    /* Contact form actions sit after fields, no overlap */
+    .contact-panel .form { min-height: 100%; }
+    .contact-panel .form .actions { margin-top: auto; }
     .btn{
       appearance:none; border:none; cursor:pointer;
       display:inline-flex; align-items:center; justify-content:center;
@@ -142,7 +151,7 @@
       .panel {
         grid-template-columns: 1.1fr .9fr;
         grid-template-areas: "hero aside";
-        align-items: center;
+        align-items: stretch;
       }
       .hero { }
       .aside {
