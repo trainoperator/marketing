@@ -47,7 +47,6 @@ body{
   display:flex; align-items:center; justify-content:space-between;
 }
 .brand{display:flex; gap:.75rem; align-items:center; text-decoration:none; color:inherit; font-weight:700}
-.brand-name{letter-spacing:.2px}
 .nav a{color:var(--muted); text-decoration:none; margin-left:1rem}
 .nav a:hover{color:var(--text)}
 

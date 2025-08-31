@@ -16,7 +16,6 @@
     <div class="container header-inner">
       <a href="/" class="brand">
         <img src="/assets/logo.svg" alt="{{ site.name }} logo" width="300em" decoding="async" />
-        <span class="brand-name">{{ site.name }}</span>
       </a>
       <nav class="nav">
         <a href="/">Home</a>
@@ -26,10 +25,17 @@
   </header>
 
   <main id="content">
-    {{ content | safe }}
-  </main>
+        {{ content | safe }}
+      </main>
 
-  <footer class="site-footer">
+    {# ensure ASIDE renders before FOOTER #}
+    {% if aside %}
+      <aside class="site-aside">
+          {{ aside | safe }}
+        </aside>
+      {% endif %}
+
+    <footer class="site-footer">
     <div class="container footer-inner">
       <p>© <span id="year"></span> {{ site.name }}. All rights reserved.</p>
       <div class="social">
