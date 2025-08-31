@@ -34,7 +34,11 @@ body{
 .container{
   max-width:1100px;
   margin-inline:auto;
-  padding: clamp(16px, 2.5vw, 28px);
+  /*padding: clamp(16px, 2.5vw, 28px);*/
+}
+
+#logo{
+  border-radius: 18px;
 }
 
 .site-header{
@@ -52,6 +56,9 @@ body{
 
 #content{display:block}
 
+.hidden{display:none !important}
+.panel{} /* marker class; no styles required */
+
 .hero{
   position:relative;
   overflow:hidden;
@@ -59,6 +66,53 @@ body{
 .hero-inner{
   padding-block: clamp(72px, 12vw, 140px);
   display:grid; gap:1.2rem;
+}
+.contact-panel{
+  position:relative;
+  /*background: var(--surface);
+  border:1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(16px, 3vw, 28px);
+  box-shadow: var(--shadow);
+  /*max-width: 720px;*/
+  margin-inline: auto;
+  margin-top: clamp(24px, 4vw, 40px);
+  width: 100%;
+}
+.close-btn{
+  position:absolute;
+  top:10px; right:12px;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--accent);
+}
+.form{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.form label{display:flex; flex-direction:column; gap:.4rem}
+.form label.full{grid-column: 1 / -1}
+.form input[type="text"],
+.form input[type="email"],
+.form textarea{
+  appearance:none;
+  width:100%;
+  padding:.8rem .9rem;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:color-mix(in srgb, var(--surface), transparent 4%);
+  color:var(--text);
+}
+.form textarea{resize:vertical}
+.form .actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: .8rem;
+  justify-content: flex-start;
 }
 .eyebrow{
   color:var(--muted);
