@@ -57,16 +57,6 @@ body{
   position:relative;
   overflow:hidden;
 }
-.hero:before{
-  content:"";
-  position:absolute; inset:-20% -10% auto -10%;
-  height:60%;
-  background:
-    radial-gradient(35rem 35rem at 10% 30%, color-mix(in srgb, var(--accent), transparent 60%) , transparent 70%),
-    radial-gradient(40rem 40rem at 90% -10%, color-mix(in srgb, var(--secondary), transparent 70%), transparent 75%);
-  filter:saturate(120%);
-  pointer-events:none;
-}
 .hero-inner{
   padding-block: clamp(72px, 12vw, 140px);
   display:grid; gap:1.2rem;
