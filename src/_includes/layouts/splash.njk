@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or site.meta.title }}</title>
+  <meta name="description" content="{{ description or site.meta.description }}">
+  <meta name="theme-color" content="{{ site.colors.accent }}">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/styles/main.css" as="style">
+  <link rel="stylesheet" href="/assets/styles/main.css">
+  <style>
+    /* Non-scrolling single screen */
+    html, body { height:100%; overflow:hidden; }
+    body { background: var(--bg); }
+
+    #stage {
+      position: relative;
+      min-height: 100svh;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 3vw, 28px);
+      isolation: isolate;
+    }
+
+    /* Large, layered gradient backdrop */
+    #stage::before, #stage::after {
+      content:"";
+      position: absolute; inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(120rem 120rem at 20% 10%, color-mix(in srgb, var(--accent), transparent 70%), transparent 65%),
+        radial-gradient(100rem 100rem at 85% 15%, color-mix(in srgb, var(--secondary), transparent 70%), transparent 68%),
+        radial-gradient(90rem 90rem at 50% 100%, color-mix(in srgb, var(--accent), white 20%), transparent 72%);
+      filter: saturate(120%);
+      opacity: .85;
+    }
+    #stage::after {
+      z-index: -1;
+      backdrop-filter: saturate(160%) blur(8px);
+    }
+
+    /* Fluid “liquid” panel */
+    .panel {
+      width: min(100%, 1120px);
+      max-height: calc(100svh - clamp(24px, 6vw, 48px) * 2);
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+      gap: clamp(16px, 2.6vw, 28px);
+      padding: clamp(16px, 3vw, 28px);
+      border-radius: 24px;
+      background: color-mix(in srgb, var(--surface), white 6%);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .top {
+      display:flex; align-items:center; justify-content:space-between; gap:1rem;
+      min-height: 40px;
+    }
+    .brand {
+      display:flex; align-items:center; gap:.75rem; text-decoration:none; color:inherit;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .brand img { width: 36px; height: 36px; border-radius: 10px }
+    .brand span { white-space: nowrap }
+
+    .hero {
+      display:grid; gap:.6rem;
+      align-content:center;
+    }
+    .eyebrow {
+      color: var(--muted);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:.78rem;
+    }
+    .headline {
+      font-size: clamp(1.8rem, 6vw, 3.2rem);
+      line-height: 1.08;
+      margin: 0;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, var(--text), color-mix(in srgb, var(--text), transparent 38%));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .subhead {
+      color: var(--muted);
+      font-size: clamp(0.98rem, 2vw, 1.1rem);
+      max-width: 70ch;
+      margin: 0;
+    }
+
+    .cta-row { display:flex; gap:.8rem; flex-wrap:wrap; align-items:center; margin-top:.4rem }
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-weight:800; text-decoration:none;
+      padding:.8rem 1.1rem; border-radius:999px;
+      box-shadow: var(--shadow);
+      transition: transform .06s ease, filter .2s ease;
+      border:1px solid color-mix(in srgb, var(--text), transparent 85%);
+    }
+    .btn:active{ transform: translateY(1px) }
+    .btn-accent{
+      background: linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent), white 12%));
+      color: white; border-color: transparent;
+    }
+    .btn-ghost{
+      background: color-mix(in srgb, var(--surface), transparent 6%);
+      color: var(--text);
+    }
+
+    .foot {
+      display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: clamp(8px, 1vw, 12px);
+    }
+
+    /* Compact on short screens */
+    @media (max-height: 620px) {
+      .headline { font-size: clamp(1.6rem, 5.5vw, 2.2rem) }
+      .panel { padding: clamp(12px, 2.2vw, 18px) }
+      .cta-row { gap:.6rem }
+      .btn { padding:.7rem 1rem }
+    }
+
+    /* Two-column on wider viewports */
+    @media (min-width: 880px) {
+      .panel {
+        grid-template-columns: 1.1fr .9fr;
+        align-items: center;
+      }
+      .hero { order: 1 }
+      .aside {
+        order: 2;
+        justify-self: end;
+        width: min(100%, 520px);
+        aspect-ratio: 4 / 3;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background:
+          radial-gradient(48rem 48rem at 30% 10%, color-mix(in srgb, var(--accent), transparent 70%), transparent 70%),
+          radial-gradient(38rem 38rem at 100% 80%, color-mix(in srgb, var(--secondary), transparent 70%), transparent 75%),
+          linear-gradient(180deg, color-mix(in srgb, var(--surface), white 2%), color-mix(in srgb, var(--surface), transparent 6%));
+        box-shadow: var(--shadow);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="stage" role="main" aria-label="Site landing">
+    <section class="panel">
+      <div class="top">
+        <a href="/" class="brand">
+          <img src="/assets/logo.svg" alt="{{ site.name }} logo" decoding="async" />
+          <span>{{ site.name }}</span>
+        </a>
+      </div>
+
+      <div class="hero">
+        <p class="eyebrow">Modern • Elegant • Minimal</p>
+        <h1 class="headline">Software for complex missions.</h1>
+        <p class="subhead">We build dependable, secure defense software — combining robust engineering with modern UX. Full site coming soon.</p>
+        <div class="cta-row">
+          <a class="btn btn-accent" href="mailto:hello@example.com">Get in touch</a>
+          <a class="btn btn-ghost" href="https://github.com/" rel="noopener">GitHub</a>
+        </div>
+      </div>
+
+      <div class="aside" aria-hidden="true"></div>
+
+      <div class="foot">
+        <span>© <span id="year"></span> {{ site.name }}</span>
+      </div>
+    </section>
+  </main>
+  <script>
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
