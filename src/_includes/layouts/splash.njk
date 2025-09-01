@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{ title or site.meta.title }}</title>
-  <meta name="description" content="{{ description or site.meta.description }}">
+  <meta name="description" content="">
   <meta name="theme-color" content="{{ site.colors.accent }}">
   <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/styles/main.css" as="style">
@@ -66,7 +66,7 @@
     @media (min-width: 880px) and (max-height: 1080px) {
       .panel {
         max-height: calc(90svh - clamp(24px, 6vw, 48px) * 2);
-        min-height: 50svh;
+        min-height: 420px;
         height: auto;
         overflow: auto;
       }
@@ -165,7 +165,7 @@
       .panel {
         /* Cap height on desktop but allow internal scrolling when content exceeds cap */
         max-height: calc(55svh - clamp(24px, 6vw, 48px) * 2);
-        min-height: 50svh;
+        min-height: 420px;
         height: auto;
         overflow: auto;
         grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
@@ -268,18 +268,22 @@
       }
 
       openBtns.forEach(b => b.addEventListener('click', () => {
-        // Lock height before swapping contents
+        // Lock height before swapping contents to avoid layout jump
         lockPanelHeight();
         hero.classList.add('hidden');
         aside.classList.add('hidden');
         contact.classList.remove('hidden');
-        // Optionally allow a tick before unlocking to avoid flash; keep locked until close for stability
+        // Immediately allow the panel to resume normal growth after DOM updates
+        // Use double rAF to ensure layout has settled before unlocking
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          unlockPanelHeight();
+        }));
       }));
       closeBtns.forEach(b => b.addEventListener('click', () => {
         contact.classList.add('hidden');
         hero.classList.remove('hidden');
         aside.classList.remove('hidden');
-        // Unlock after content is restored so height can adapt again
+        // Unlock after content is restored so height can adapt again (defensive if already unlocked)
         unlockPanelHeight();
       }));
     })();
