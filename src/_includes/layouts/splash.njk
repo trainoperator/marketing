@@ -44,8 +44,10 @@
     /* Fluid “liquid” panel */
     .panel {
       width: min(100%, 1120px);
-      max-height: calc(100svh - clamp(24px, 6vw, 48px) * 2);
-      min-height: calc(100svh - clamp(24px, 6vw, 48px) * 8);
+      /* Default: cap height to roughly half the viewport on large desktops */
+      max-height: calc(55svh - clamp(24px, 6vw, 48px) * 2);
+      /* Lock the panel's visual height so it doesn't collapse when swapping content */
+      height: calc(55svh - clamp(24px, 6vw, 48px) * 2);
       display: grid;
       grid-template-columns: 1fr;
       grid-auto-rows: auto;
@@ -53,12 +55,19 @@
         "aside"
         "hero";
       gap: clamp(16px, 2.6vw, 28px);
-      padding: clamp(16px, 3vw, 28px);
+      padding: clamp(16px, 3vw, 28px) clamp(16px, 3vw, 28px) 0 clamp(16px, 3vw, 28px);
       border-radius: 24px;
       background: color-mix(in srgb, var(--surface), white 6%);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       overflow: hidden;
+    }
+
+    /* On shorter windows (e.g., < ~50% of 4K height), allow up to ~90% viewport height */
+    @media (max-height: 1080px) {
+      .panel {
+        max-height: calc(90svh - clamp(24px, 6vw, 48px) * 2);
+      }
     }
 
     .top {
@@ -141,7 +150,7 @@
     /* Compact on short screens */
     @media (max-height: 620px) {
       .headline { font-size: clamp(1.6rem, 5.5vw, 2.2rem) }
-      .panel { padding: clamp(12px, 2.2vw, 18px) }
+      .panel { padding: clamp(12px, 2.2vw, 18px) clamp(12px, 2.2vw, 18px) 0 clamp(12px, 2.2vw, 18px) }
       .cta-row { gap:.6rem }
       .btn { padding:.7rem 1rem }
     }
@@ -149,17 +158,23 @@
     /* Two-column on wider viewports */
     @media (min-width: 880px) {
       .panel {
-        grid-template-columns: 1.1fr .9fr;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
         grid-template-areas: "hero aside";
         align-items: stretch;
       }
+      /* Allow grid children to shrink properly to avoid clipping */
+      .hero, .aside { min-width: 0; }
       .hero { }
       .aside {
-        justify-self: end;
+        justify-self: stretch;
         width: min(100%, 520px);
         aspect-ratio: 4 / 3;
-
+        display: grid;
+        place-items: center;
+        padding: clamp(8px, 1.2vw, 16px);
       }
+      /* Constrain and center the logo */
+      #logo { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
     }
   </style>
 </head>
