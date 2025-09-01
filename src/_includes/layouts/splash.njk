@@ -268,22 +268,18 @@
       }
 
       openBtns.forEach(b => b.addEventListener('click', () => {
-        // Lock height before swapping contents to avoid layout jump
+        // Lock height before swapping contents
         lockPanelHeight();
         hero.classList.add('hidden');
         aside.classList.add('hidden');
         contact.classList.remove('hidden');
-        // Immediately allow the panel to resume normal growth after DOM updates
-        // Use double rAF to ensure layout has settled before unlocking
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          unlockPanelHeight();
-        }));
+        // Optionally allow a tick before unlocking to avoid flash; keep locked until close for stability
       }));
       closeBtns.forEach(b => b.addEventListener('click', () => {
         contact.classList.add('hidden');
         hero.classList.remove('hidden');
         aside.classList.remove('hidden');
-        // Unlock after content is restored so height can adapt again (defensive if already unlocked)
+        // Unlock after content is restored so height can adapt again
         unlockPanelHeight();
       }));
     })();
