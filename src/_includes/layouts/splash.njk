@@ -66,6 +66,7 @@
     @media (min-width: 880px) and (max-height: 1080px) {
       .panel {
         max-height: calc(90svh - clamp(24px, 6vw, 48px) * 2);
+        min-height: 50svh;
         height: auto;
         overflow: auto;
       }
@@ -164,6 +165,7 @@
       .panel {
         /* Cap height on desktop but allow internal scrolling when content exceeds cap */
         max-height: calc(55svh - clamp(24px, 6vw, 48px) * 2);
+        min-height: 50svh;
         height: auto;
         overflow: auto;
         grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
