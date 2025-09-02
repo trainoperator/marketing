@@ -190,6 +190,71 @@
     /* Remove top margin from contact title */
     #contact-title { margin-top: 0; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/openpgp@4.10.10/dist/openpgp.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          (async () => {
+            const form = document.getElementById('contact-form');
+            if (!form || !window.openpgp) {
+                console.log('OpenPGP or Form not available, cannot encrypt messages');
+                return;
+            }
+
+            // Paste your Proton public key here (export from Settings ▸ Keys ▸ Download public key)
+            const ARMORED_PUBKEY = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xjMEaJroChYJKwYBBAHaRw8BAQdAYORLojhZn2mIDfs8EXMrU9xkXeHfEKdn
+aXdearDkHsPNLXRyYWlub3BlcmF0b3JhaUBwbS5tZSA8dHJhaW5vcGVyYXRv
+cmFpQHBtLm1lPsLAEQQTFgoAgwWCaJroCgMLCQcJkI0dnMgeplswRRQAAAAA
+ABwAIHNhbHRAbm90YXRpb25zLm9wZW5wZ3Bqcy5vcmcPX2W02pRpUS8VxIMM
+3BNrmqU6h5uAil3idj4XP5v+IQMVCggEFgACAQIZAQKbAwIeARYhBEY6DSc7
+JTMltKzbOo0dnMgeplswAAC0vgEAspRaBh4yVr5EZ2uwyLMrHSupI9n7BLN9
+ymiHO/pB1TMBAKDvwJ5I7TQUqCl8umMkbIbASMdeqTtJIPPraMiFjmEEzjgE
+aJroChIKKwYBBAGXVQEFAQEHQHwUFcjcNIVEjJnl7TxD2VP6EG+VNObQ9RG8
+ycFDDgY/AwEIB8K+BBgWCgBwBYJomugKCZCNHZzIHqZbMEUUAAAAAAAcACBz
+YWx0QG5vdGF0aW9ucy5vcGVucGdwanMub3JnjahYVUF/aM7eVuFn3YeRY9zM
+UmYAUxJG94jRkTycPDACmwwWIQRGOg0nOyUzJbSs2zqNHZzIHqZbMAAAnE8A
+/21AEoySCsh0Z+A5EWytnR5MukwdK5M0Ue8yx/h3vJHFAQDxniXiJVklHFhd
+hEyPrjunyfNTu0hfC1aZQ+x3LffmAg==
+=PRCc
+-----END PGP PUBLIC KEY BLOCK-----`;
+
+            const publicKey = (await openpgp.key.readArmored(ARMORED_PUBKEY)).keys[0];
+
+            form.addEventListener('submit', async (e) => {
+                // Prevent double-encrypt on back/forward navigations
+                if (form.dataset.encrypted === '1') return;
+
+                e.preventDefault();
+
+                const nameEl = form.querySelector('[name="name"]');
+                const emailEl = form.querySelector('[name="email"]');
+                const msgEl   = form.querySelector('[name="message"]');
+
+                const name = (nameEl?.value || '').trim();
+                const email = (emailEl?.value || '').trim();
+                const messagePlain = (msgEl?.value || '');
+
+                // Put useful headers inside the encrypted text too
+                const payload = `From: ${name} <${email}>\n\n${messagePlain}`;
+
+                const encrypted = await openpgp.encrypt({
+                    message: openpgp.message.fromText(payload),
+                    publicKeys: publicKey
+                });
+
+                // Replace the textarea content with ciphertext
+                msgEl.value = encrypted.data;
+                form.dataset.encrypted = '1';
+                console.log('Message encrypted');
+                form.querySelector('[name="payload"]').value = encrypted.data;
+                // Submit the form without logging form.submit() return (which is undefined in many browsers)
+                form.submit();
+            });
+        })();
+        });
+    </script>
+
 </head>
 <body>
   <main id="stage" role="main" aria-label="Site landing">
@@ -212,7 +277,7 @@
          aria-labelledby="contact-title">
       <button type="button" class="close-btn js-close-contact" aria-label="Close">×</button>
       <h2 id="contact-title">Contact us</h2>
-      <form action="https://api.web3forms.com/submit" method="POST" class="form">
+      <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="form">
         <!-- Replace with your Web3Forms access key -->
         <input type="hidden" name="access_key" value="fe58bbf2-9be1-4f5e-8ffb-57c0fc3ddecb">
         <input type="hidden" name="from_name" value="{{ site.name }}">
