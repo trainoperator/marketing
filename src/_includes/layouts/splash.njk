@@ -190,6 +190,34 @@
     /* Remove top margin from contact title */
     #contact-title { margin-top: 0; }
   </style>
+  <style>
+    /* Blog styles and fade-in animation */
+    /* Offset blog below initial viewport so user must scroll */
+    .blog-section{ padding: clamp(36px, 8vw, 80px) 0; margin-top: 100svh; }
+    /* Make the splash panel stick to top when reached */
+    #panel { position: sticky; top: 0; z-index: 5; }
+    /* When stuck, add subtle backdrop for readability */
+    #panel.is-stuck { backdrop-filter: saturate(140%) blur(6px); background: color-mix(in srgb, var(--surface), transparent 4%); }
+
+    .blog-title{ margin: 0 0 .75rem 0; font-size: clamp(1.4rem, 3vw, 2.2rem); }
+    .posts-grid{ display:grid; gap:1rem; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    @media (min-width: 720px){ .posts-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1040px){ .posts-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .post-card{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.1rem 1.2rem;
+      box-shadow: var(--shadow);
+      opacity: 0; transform: translateY(14px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .post-card.is-visible{ opacity: 1; transform: translateY(0); }
+    .post-card-title{ margin: 0 0 .25rem 0; font-size: 1.1rem; }
+    .post-meta{ color: var(--muted); margin: 0 0 .5rem 0; font-size: .95rem; }
+    .post-desc{ margin: 0; }
+    .post-empty{ color: var(--muted); }
+  </style>
 </head>
 <body>
   <main id="stage" role="main" aria-label="Site landing">
@@ -241,6 +269,23 @@
       </noscript>
     </div>
     </section>
+    <!-- Blog section below the splash -->
+    <section id="blog" class="blog-section" aria-label="Latest blog posts">
+      <div class="container">
+        <h2 class="blog-title">Latest posts</h2>
+        <div class="posts-grid">
+          {% for post in collections.posts | reverse %}
+            <article class="post-card fade-item">
+              <h3 class="post-card-title"><a href="{{ post.url }}">{{ post.data.title }}</a></h3>
+              <p class="post-meta">{{ post.date | date('MMMM d, yyyy') }}</p>
+              {% if post.data.description %}<p class="post-desc">{{ post.data.description }}</p>{% endif %}
+            </article>
+          {% else %}
+            <p class="post-empty">No posts yet. Stay tuned.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
   </main>
   <script>
     const y = document.getElementById('year');
@@ -250,6 +295,30 @@
       const aside = document.getElementById('aside');
       const contact = document.getElementById('contact-panel');
       const panel = document.getElementById('panel');
+
+      // Observe when the panel reaches the top to toggle a stuck class
+      if (panel && 'IntersectionObserver' in window) {
+        const sentry = document.createElement('div');
+        sentry.setAttribute('aria-hidden', 'true');
+        sentry.style.position = 'absolute';
+        sentry.style.top = '-1px';
+        sentry.style.left = '0';
+        sentry.style.right = '0';
+        sentry.style.height = '1px';
+        // Place sentry at the top of the panel to detect when it hits viewport top
+        panel.prepend(sentry);
+        const ioSticky = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            // When the top of panel reaches top of viewport, the sentry goes out of view
+            if (entry.isIntersecting) {
+              panel.classList.remove('is-stuck');
+            } else {
+              panel.classList.add('is-stuck');
+            }
+          });
+        }, { root: null, threshold: 1, rootMargin: '0px' });
+        ioSticky.observe(sentry);
+      }
 
       const openBtns = document.querySelectorAll('.js-open-contact');
       const closeBtns = document.querySelectorAll('.js-close-contact');
@@ -283,6 +352,22 @@
         unlockPanelHeight();
       }));
     })();
+    // Fade-in blog posts when they enter viewport
+    const cards = document.querySelectorAll('.post-card');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+      cards.forEach(c => io.observe(c));
+    } else {
+      // Fallback: reveal all
+      cards.forEach(c => c.classList.add('is-visible'));
+    }
   </script>
   <script data-goatcounter="https://trainoperator.goatcounter.com/count"
           async src="//gc.zgo.at/count.js"></script>

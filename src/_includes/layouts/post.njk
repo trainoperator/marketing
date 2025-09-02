@@ -1,0 +1,14 @@
+---
+layout: layouts/base.njk
+---
+<article class="page narrow" itemscope itemtype="https://schema.org/BlogPosting">
+  <header>
+    <p class="eyebrow">Blog</p>
+    <h1 itemprop="headline">{{ title }}</h1>
+    {% if date %}<p class="subhead" itemprop="datePublished">{{ date | date('MMMM d, yyyy') }}</p>{% endif %}
+    {% if description %}<p class="subhead" itemprop="description">{{ description }}</p>{% endif %}
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    {{ content | safe }}
+  </div>
+</article>
